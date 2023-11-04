@@ -39,21 +39,27 @@ function Section({ children, title }) {
   );
 }
 //Read user data
-const getUserData = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem('@user');
-    setUsername(jsonValue != null ? JSON.parse(jsonValue) : null);
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch(e) {
-  }
-};
-// useEffect(()=>{
-//  getUserData();
-// },[]);
+
 const LoginScreen = (props) => {
   const [userName, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+
+  const getUserData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@user');
+      if(jsonValue!=null){
+        const data= JSON.parse(jsonValue); 
+        setUsername(data.username);
+        setPassword(data.password); 
+      }
+      
+    } catch(e) {
+    }
+  };
+  useEffect(()=>{
+   getUserData();
+  },[]);
 
   //Save user data
 const storeUserData = async (userData) => {
@@ -67,8 +73,9 @@ const storeUserData = async (userData) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const handleLogin = () => {
-   // storeUserData(dt);
-    if (userName === 'admin' && password === 'admin') {
+   
+   if ((userName === 'admin' && password === 'adminpw') || (userName === 'user' && password === 'userpw')) {
+       storeUserData({username: userName, password: password});
       props.navigation.navigate("Home");
       Alert.alert('Success', 'Logged in successfully!');
     } else {
